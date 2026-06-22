@@ -17,7 +17,6 @@ class FinanceIncomeHeadSeeder extends Seeder
 
         $flatIncomeHeads = [
             // Standard Parish Receipts (Requested List)
-            ['code' => 'INC-001', 'name' => 'Monthly Family Contribution', 'description' => 'Regular monthly contribution from parish families.'],
             ['code' => 'INC-002', 'name' => 'Sunday Offering', 'description' => 'Collections during Sunday Holy Qurbana services.'],
             ['code' => 'INC-008', 'name' => 'Dukhrana', 'description' => 'Special contributions for memorial feasts or Dukhrana days.'],
             ['code' => 'INC-009', 'name' => 'Baptism Offering', 'description' => 'Offerings made during the sacrament of Holy Baptism.'],
@@ -43,7 +42,8 @@ class FinanceIncomeHeadSeeder extends Seeder
             // Parent Heads
             ['code' => 'INC-028', 'name' => 'Qurbana Offerings', 'description' => 'Hierarchical parent for all Qurbana-related offerings.'],
             ['code' => 'INC-029', 'name' => 'Special Prayer Offerings', 'description' => 'Hierarchical parent for all special prayer intercessions and requests.'],
-            ['code' => 'INC-003', 'name' => 'Nercha Offerings', 'description' => 'Hierarchical parent for all Nercha / Votive offerings.']
+            ['code' => 'INC-003', 'name' => 'Nercha Offerings', 'description' => 'Hierarchical parent for all Nercha / Votive offerings.'],
+            ['code' => 'INC-050', 'name' => 'Membership Contributions', 'description' => 'Hierarchical parent for all family membership contributions.']
         ];
 
         foreach ($flatIncomeHeads as $head) {
@@ -64,6 +64,7 @@ class FinanceIncomeHeadSeeder extends Seeder
         $qurbanaParent = FinanceIncomeHead::where('code', 'INC-028')->first();
         $prayerParent = FinanceIncomeHead::where('code', 'INC-029')->first();
         $nerchaParent = FinanceIncomeHead::where('code', 'INC-003')->first();
+        $membershipParent = FinanceIncomeHead::where('code', 'INC-050')->first();
 
         // 3. Seed subheads under Qurbana Offerings
         $qurbanaSubheads = [
@@ -135,6 +136,30 @@ class FinanceIncomeHeadSeeder extends Seeder
                 [
                     'chart_account_id' => $revenueAccount->id,
                     'parent_id' => $nerchaParent->id,
+                    'name' => $sub['name'],
+                    'description' => $sub['description'],
+                    'member_default' => true,
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        // 6. Seed subheads under Membership Contributions
+        $membershipSubheads = [
+            ['code' => 'INC-001', 'name' => 'Monthly Family Contribution', 'description' => 'Regular monthly contribution from parish families.'],
+            ['code' => 'INC-051', 'name' => 'Annual Family Contribution', 'description' => 'Regular annual contribution from parish families.'],
+            ['code' => 'INC-052', 'name' => 'Parish Subscription', 'description' => 'Regular subscription fees paid by parish members.'],
+            ['code' => 'INC-053', 'name' => 'Arrear Contribution', 'description' => 'Contributions paid for past due membership arrears.'],
+            ['code' => 'INC-054', 'name' => 'Tithe', 'description' => 'Tithe offerings (one-tenth contribution of income).'],
+            ['code' => 'INC-055', 'name' => 'Special Family Contribution', 'description' => 'One-off or special purpose contribution from parish families.']
+        ];
+
+        foreach ($membershipSubheads as $sub) {
+            FinanceIncomeHead::updateOrCreate(
+                ['code' => $sub['code']],
+                [
+                    'chart_account_id' => $revenueAccount->id,
+                    'parent_id' => $membershipParent->id,
                     'name' => $sub['name'],
                     'description' => $sub['description'],
                     'member_default' => true,
